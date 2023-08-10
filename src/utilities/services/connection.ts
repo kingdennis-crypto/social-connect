@@ -1,15 +1,23 @@
 import { Client } from 'pg'
 
+/**
+ * A singleton class that initializes a connection with Postgres for dependency injection
+ * @class
+ */
 export default class ConnectionService {
   // The singleton instance
   private static instance: ConnectionService
   // The database client for access
   private client: Client
 
-  // TODO: Think about making the connection object as a parameter
+  /**
+   * Initializes the database connection
+   * @constructor
+   * @private
+   */
   private constructor() {
+    // TODO: Think about making the connection object as a parameter
     const { POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD } = process.env
-    console.log({ POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD })
 
     this.client = new Client({
       host: '127.0.0.1',
@@ -22,6 +30,11 @@ export default class ConnectionService {
     this.connect()
   }
 
+  /**
+   * Establish a connection with the database
+   * @private
+   * @async
+   */
   private async connect() {
     try {
       await this.client.connect()
@@ -31,6 +44,12 @@ export default class ConnectionService {
     }
   }
 
+  /**
+   * Retrieves and returns the singleton instance of the ConnectionService class.
+   * If no instance exists, create a new one and return it.
+   * @static
+   * @returns {ConnectionService} The singleton instance
+   */
   public static getInstance(): ConnectionService {
     if (!ConnectionService.instance) {
       ConnectionService.instance = new ConnectionService()
@@ -39,6 +58,10 @@ export default class ConnectionService {
     return ConnectionService.instance
   }
 
+  /**
+   * Retrieves the PostgreSQL client for database access.
+   * @returns {Client} The postgreSQL client instance.
+   */
   public getClient(): Client {
     return this.client
   }
