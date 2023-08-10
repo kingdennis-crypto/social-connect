@@ -2,7 +2,7 @@
  * UTILITITES
  */
 export type DatabaseResponse<T> = {
-  data: T[]
+  data: T
   count: number
 }
 

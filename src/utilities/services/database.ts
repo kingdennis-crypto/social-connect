@@ -13,7 +13,7 @@ const client: Client = service.getClient()
  * @abstract
  * @template T - The type of the query result rows
  */
-export default abstract class DatabaseService<T> {
+export default abstract class DatabaseService {
   constructor() {}
 
   /**
@@ -22,10 +22,10 @@ export default abstract class DatabaseService<T> {
    * @returns {Promise<T[]>} - A promise containing the results as rows
    * @throws {any} - Will throw error if executing the query failed
    */
-  async queryDB(query: string): Promise<DatabaseResponse<T>> {
+  async queryDB<T>(query: string): Promise<DatabaseResponse<T>> {
     try {
       const result: QueryResult = await client.query(query)
-      return formatDBObject(result)
+      return formatDBObject<T>(result)
     } catch (error: any) {
       console.error('Error executing query:', error)
       return Promise.reject(error)
@@ -40,7 +40,7 @@ export default abstract class DatabaseService<T> {
    * @returns {DatabaseResponse<T>} - The formatted response object
    * @throws {any} - Will throw error if executing the query failed
    */
-  async queryDBWithValues(
+  async queryDBWithValues<T>(
     query: string,
     values: unknown[]
   ): Promise<DatabaseResponse<T>> {
