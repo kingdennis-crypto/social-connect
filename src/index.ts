@@ -1,31 +1,19 @@
-console.log("Hello World!")
+import 'module-alias/register'
+import dotenv from 'dotenv'
 
-import { Client } from 'pg';
+// Initialize .env environment
+dotenv.config()
 
-// Replace these with your actual database credentials
-const dbConfig = {
-  user: 'myuser',
-  password: 'mypassword',
-  database: 'mydatabase',
-  host: 'localhost',
-  port: 5432,
-};
+import UserRepo from '@/repositories/user'
+import ConnectionService from './utilities/services/connection'
+
+// Initialize services
+ConnectionService.getInstance()
 
 async function connectAndQuery() {
-  const client = new Client(dbConfig);
+  const client = new UserRepo()
 
-  try {
-    await client.connect();
-    console.log('Connected to the database');
-
-    const queryResult = await client.query('SELECT * FROM test');
-    console.log('Query result:', queryResult.rows);
-  } catch (error) {
-    console.error('Error:', error);
-  } finally {
-    await client.end();
-    console.log('Connection closed');
-  }
+  console.log('QUERY', await client.getAll())
 }
 
-connectAndQuery();
+connectAndQuery()
