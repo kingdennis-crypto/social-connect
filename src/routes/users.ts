@@ -13,6 +13,8 @@ import {
   InvalidId,
 } from '@/errors'
 
+import { ResponseMessages } from '@/enums'
+
 const router: Router = express.Router()
 const repo: UserRepo = new UserRepo()
 
@@ -34,8 +36,7 @@ router.get('/', async (req: Request, res: Response) => {
     const users: DatabaseResponse<User[]> = await repo.getAll()
     formatSuccessResponse(res, 200, users)
   } catch (error) {
-    console.error('Error:', error)
-    formatErrorResponse(res, 500, 'Internal server error')
+    formatErrorResponse(res, 500, ResponseMessages.SERVER_ERROR)
   }
 })
 
@@ -47,7 +48,7 @@ router.get('/:id', async (req: Request, res: Response) => {
     const isValidId: boolean = isNumber(req.params.id)
 
     if (!isValidId) {
-      throw new InvalidId('Invalid ID')
+      throw new InvalidId(ResponseMessages.INVALID_ID)
     }
 
     const id: number = parseInt(req.params.id)
@@ -59,7 +60,7 @@ router.get('/:id', async (req: Request, res: Response) => {
     } else if (error instanceof NotFound) {
       formatErrorResponse(res, 400, error.message)
     } else {
-      formatErrorResponse(res, 500, 'Internal server error')
+      formatErrorResponse(res, 500, ResponseMessages.SERVER_ERROR)
     }
   }
 })
@@ -72,7 +73,7 @@ router.post('/', async (req: Request, res: Response) => {
     const user: UserBody = req.body
 
     if (!user.name) {
-      throw new PropertyRequiredError('Not all fields were entered')
+      throw new PropertyRequiredError(ResponseMessages.EMPTY_FIELDS)
     }
 
     // Create the user and return it
@@ -82,7 +83,7 @@ router.post('/', async (req: Request, res: Response) => {
     if (error instanceof PropertyRequiredError) {
       formatErrorResponse(res, 400, error.message)
     } else {
-      formatErrorResponse(res, 500, 'Internal server error')
+      formatErrorResponse(res, 500, ResponseMessages.SERVER_ERROR)
     }
   }
 })
@@ -95,18 +96,18 @@ router.put('/:id', async (req: Request, res: Response) => {
     const isValidId: boolean = isNumber(req.params.id)
 
     if (!isValidId) {
-      throw new InvalidId('Invalid ID')
+      throw new InvalidId(ResponseMessages.INVALID_ID)
     }
 
     const id: number = parseInt(req.params.id)
     const user: User = req.body
 
     if (!(user.id && user.name)) {
-      throw new PropertyRequiredError('Not all fields were entered')
+      throw new PropertyRequiredError(ResponseMessages.EMPTY_FIELDS)
     }
 
     if (id !== user.id) {
-      throw new ValidationError("Invalid: ID's don't match")
+      throw new ValidationError(ResponseMessages.ID_MISMATCH)
     }
 
     // Update the user and return the returned data
@@ -122,7 +123,7 @@ router.put('/:id', async (req: Request, res: Response) => {
     } else if (error instanceof NotFound) {
       formatErrorResponse(res, 400, error.message)
     } else {
-      formatErrorResponse(res, 500, 'Internal server error')
+      formatErrorResponse(res, 500, ResponseMessages.SERVER_ERROR)
     }
   }
 })
@@ -135,7 +136,7 @@ router.delete('/:id', async (req: Request, res: Response) => {
     const isValidId: boolean = isNumber(req.params.id)
 
     if (!isValidId) {
-      throw new InvalidId('Invalid ID')
+      throw new InvalidId(ResponseMessages.INVALID_ID)
     }
 
     const id: number = parseInt(req.params.id)
@@ -148,7 +149,7 @@ router.delete('/:id', async (req: Request, res: Response) => {
     } else if (error instanceof NotFound) {
       formatErrorResponse(res, 400, error.message)
     } else {
-      formatErrorResponse(res, 500, 'Internal server error')
+      formatErrorResponse(res, 500, ResponseMessages.SERVER_ERROR)
     }
   }
 })

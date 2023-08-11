@@ -1,3 +1,4 @@
+import { ResponseMessages } from '@/enums'
 import { NotFound } from '@/errors'
 import { DatabaseResponse, User } from '@/types'
 import DatabaseService from '@/utilities/services/database'
@@ -40,7 +41,7 @@ export default class UserRepo extends DatabaseService {
 
       // If the user doesn't exist throw error
       if (user.count === 0) {
-        throw new NotFound('This user was not found')
+        throw new NotFound(ResponseMessages.USER_NOT_FOUND)
       }
 
       return user
