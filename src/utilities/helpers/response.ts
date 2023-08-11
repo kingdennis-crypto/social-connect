@@ -1,5 +1,5 @@
 import { Response } from 'express'
-import { DatabaseResponse, SuccessResponse } from '@/types'
+import { DatabaseResponse } from '@/types'
 
 export function formatSuccessResponse<T>(
   response: Response,
@@ -7,20 +7,23 @@ export function formatSuccessResponse<T>(
   payload: DatabaseResponse<T>
 ): void {
   response.status(statusCode).json({
+    success: true,
     statusCode: statusCode,
-    timestamp: Date.now(),
     payload: payload,
   })
 }
 
-export function formatErrorResponse<T>(
+export function formatErrorResponse(
   response: Response,
   statusCode: number,
   message: string
 ): void {
   response.status(statusCode).json({
-    timestamp: Date.now(),
+    success: false,
     statusCode: statusCode,
-    message: message,
+    error: {
+      timestamp: Date.now(),
+      message: message,
+    },
   })
 }

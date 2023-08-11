@@ -1,7 +1,11 @@
 import { ResponseMessages } from '@/enums'
 import { NotFound } from '@/errors'
 import { DatabaseResponse, User } from '@/types'
+import LoggerService from '@/utilities/services/logger'
 import DatabaseService from '@/utilities/services/database'
+
+const loggerService = LoggerService.getInstance()
+const logger = loggerService.getLogger()
 
 /**
  * Repository class for handling user-related database queries.
@@ -21,7 +25,7 @@ export default class UserRepo extends DatabaseService {
     try {
       return await super.queryDB<User[]>('SELECT * FROM users')
     } catch (error: unknown) {
-      console.error('Error:', error)
+      logger.error((error as Error).message)
       throw error
     }
   }
@@ -45,8 +49,13 @@ export default class UserRepo extends DatabaseService {
       }
 
       return user
-    } catch (error) {
-      console.error('Error:', error)
+    } catch (error: unknown) {
+      if (error instanceof NotFound) {
+        logger.error(ResponseMessages.USER_NOT_FOUND)
+      } else {
+        logger.error((error as Error).message)
+      }
+
       throw error
     }
   }
@@ -62,8 +71,8 @@ export default class UserRepo extends DatabaseService {
         'INSERT INTO users (name) values ($1) RETURNING id, name',
         [name]
       )
-    } catch (error) {
-      console.error('Error:', error)
+    } catch (error: unknown) {
+      logger.error((error as Error).message)
       throw error
     }
   }
@@ -83,8 +92,8 @@ export default class UserRepo extends DatabaseService {
         'DELETE FROM users WHERE id=$1 RETURNING id, name',
         [id]
       )
-    } catch (error) {
-      console.error('Error:', error)
+    } catch (error: unknown) {
+      logger.error((error as Error).message)
       throw error
     }
   }
@@ -105,8 +114,8 @@ export default class UserRepo extends DatabaseService {
         'UPDATE users SET name=$1 WHERE id=$2 RETURNING id, name',
         [user.name, id]
       )
-    } catch (error) {
-      console.error('Error:', error)
+    } catch (error: unknown) {
+      logger.error((error as Error).message)
       throw error
     }
   }

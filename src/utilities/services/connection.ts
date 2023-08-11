@@ -1,4 +1,8 @@
 import { Client } from 'pg'
+import LoggerService from '@/utilities/services/logger'
+
+const loggerService = LoggerService.getInstance()
+const logger = loggerService.getLogger()
 
 /**
  * A singleton class that initializes a connection with Postgres for dependency injection
@@ -35,12 +39,21 @@ export default class ConnectionService {
    * @private
    * @async
    */
-  private async connect() {
+  private async connect(): Promise<void> {
     try {
       await this.client.connect()
-      console.log('Connected to the database')
+      logger.info('Connected to the database')
     } catch (error) {
-      console.error('Error:', error)
+      logger.error('Database connection error:', error)
+    }
+  }
+
+  public disconnect(): void {
+    try {
+      this.client.end()
+      logger.info('Disconnected from the database')
+    } catch (error) {
+      logger.error('Database connection error:', error)
     }
   }
 

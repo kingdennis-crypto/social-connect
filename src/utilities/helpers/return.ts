@@ -10,6 +10,6 @@ import { QueryResult } from 'pg'
 export function formatDBObject<T>(result: QueryResult): DatabaseResponse<T> {
   return {
     count: result.rowCount,
-    data: result.rows,
+    data: result.rows as T,
   }
 }

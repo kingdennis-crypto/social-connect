@@ -8,16 +8,20 @@ import express, { Application } from 'express'
 import bodyParser from 'body-parser'
 import cors from 'cors'
 
-import ConnectionService from './utilities/services/connection'
+import ConnectionService from '@/utilities/services/connection'
+import LoggerService from '@/utilities/services/logger'
 
 const PORT: number = (process.env.PORT as unknown as number) || 3000
-const BASE_URL: string = (process.env.BASE_URL as unknown as string) || '/api'
 
 // Routes
 import UserRoutes from '@/routes/users'
 
-// Initialize services
+// Initialize connection service
 ConnectionService.getInstance()
+
+// Initialize logger service
+const loggerService = LoggerService.getInstance()
+const logger = loggerService.getLogger()
 
 const APP: Application = express()
 
@@ -30,6 +34,6 @@ APP.use(cors())
 APP.use('/users', UserRoutes)
 
 APP.listen(PORT, (): void => {
-  console.log(`Server is listening at port: ${PORT}`)
+  logger.info('Server is listening at port: %d', PORT)
 })
 

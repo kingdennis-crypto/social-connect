@@ -2,10 +2,14 @@ import { DatabaseResponse } from '@/types'
 import ConnectionService from '@/utilities/services/connection'
 import { Client, QueryResult } from 'pg'
 import { formatDBObject } from '../helpers/return'
+import LoggerService from './logger'
 
 // Get the singleton instance
 const service: ConnectionService = ConnectionService.getInstance()
 const client: Client = service.getClient()
+
+const loggerService = LoggerService.getInstance()
+const logger = loggerService.getLogger()
 
 /**
  * An abstract class that provides the base for the database service.
@@ -26,9 +30,9 @@ export default abstract class DatabaseService {
     try {
       const result: QueryResult = await client.query(query)
       return formatDBObject<T>(result)
-    } catch (error: any) {
-      console.error('Error executing query:', error)
-      return Promise.reject(error)
+    } catch (error: unknown) {
+      logger.error('Error executing query: %s', error)
+      throw error
     }
   }
 
@@ -47,9 +51,9 @@ export default abstract class DatabaseService {
     try {
       const result: QueryResult = await client.query(query, values)
       return formatDBObject(result)
-    } catch (error) {
-      console.error('Error executing query:', error)
-      return Promise.reject(error)
+    } catch (error: unknown) {
+      logger.error('Error executing query: %s', error)
+      throw error
     }
   }
 }
