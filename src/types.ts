@@ -6,6 +6,12 @@ export type DatabaseResponse<T> = {
   count: number
 }
 
+export type SuccessResponse<T> = {
+  timestamp: number
+  statusCode: number
+  payload: DatabaseResponse<T>
+}
+
 /**
  * MODELS
  */

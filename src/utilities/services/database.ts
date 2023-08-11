@@ -22,7 +22,7 @@ export default abstract class DatabaseService {
    * @returns {Promise<T[]>} - A promise containing the results as rows
    * @throws {any} - Will throw error if executing the query failed
    */
-  async queryDB<T>(query: string): Promise<DatabaseResponse<T>> {
+  protected async queryDB<T>(query: string): Promise<DatabaseResponse<T>> {
     try {
       const result: QueryResult = await client.query(query)
       return formatDBObject<T>(result)
@@ -40,7 +40,7 @@ export default abstract class DatabaseService {
    * @returns {DatabaseResponse<T>} - The formatted response object
    * @throws {any} - Will throw error if executing the query failed
    */
-  async queryDBWithValues<T>(
+  protected async queryDBWithValues<T>(
     query: string,
     values: unknown[]
   ): Promise<DatabaseResponse<T>> {
