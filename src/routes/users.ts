@@ -15,10 +15,12 @@ import {
 } from '@/errors'
 
 import { ResponseMessages } from '@/enums'
+import EncryptionHelper from '@/utilities/helpers/encryption'
 
 const router: Router = express.Router()
 const repo: UserRepo = new UserRepo()
 
+// Create a new type without the id
 type UserBody = Omit<User, 'id'>
 
 // function getAllKeys<T extends object>(obj: T): Array<keyof T> {
@@ -77,12 +79,13 @@ router.post('/', async (req: Request, res: Response) => {
       throw new PropertyRequiredError(ResponseMessages.EMPTY_FIELDS)
     }
 
-    const generatedPassword = ''
+    // Encrypt the password with bcrypt
+    const hashedPassword = await EncryptionHelper.hashPassword(user.password)
 
     // Create the user and return it
     const result: DatabaseResponse<User[]> = await repo.createUser(
       user.email,
-      user.password
+      hashedPassword
     )
     formatSuccessResponse(res, 200, result)
   } catch (error) {
