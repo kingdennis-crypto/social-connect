@@ -1,6 +1,6 @@
 import express, { Request, Response, Router } from 'express'
 import UserRepo from '@/repositories/user'
-import { DatabaseResponse, User } from '@/types'
+import type { DatabaseResponse, User } from '@/types'
 import {
   formatErrorResponse,
   formatSuccessResponse,

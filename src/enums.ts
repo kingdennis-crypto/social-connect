@@ -4,5 +4,6 @@ export enum ResponseMessages {
   ID_MISMATCH = "The ID's don't match",
   USER_NOT_FOUND = 'This user was not found',
   USER_EXISTS = 'This email is already in use',
+  INVALID_LOGIN_CREDENTIALS = 'Invalid login credentials',
   SERVER_ERROR = 'Internal server error',
 }

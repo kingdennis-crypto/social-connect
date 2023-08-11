@@ -13,6 +13,8 @@ export class InvalidId extends BaseError {}
 
 export class UserAlreadyExist extends BaseError {}
 
+export class InvalidLoginCredentials extends BaseError {}
+
 /**
  * Error class indicating that the resource was not found
  * @class
