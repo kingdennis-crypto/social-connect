@@ -9,7 +9,7 @@ export function formatSuccessResponse<T>(
   response.status(statusCode).json({
     success: true,
     statusCode: statusCode,
-    payload: payload,
+    ...payload,
   })
 }
 

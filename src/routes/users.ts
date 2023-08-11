@@ -11,6 +11,7 @@ import {
   PropertyRequiredError,
   NotFound,
   InvalidId,
+  UserAlreadyExist,
 } from '@/errors'
 
 import { ResponseMessages } from '@/enums'
@@ -20,9 +21,9 @@ const repo: UserRepo = new UserRepo()
 
 type UserBody = Omit<User, 'id'>
 
-function getAllKeys<T extends object>(obj: T): Array<keyof T> {
-  return Object.keys(obj) as Array<keyof T>
-}
+// function getAllKeys<T extends object>(obj: T): Array<keyof T> {
+//   return Object.keys(obj) as Array<keyof T>
+// }
 
 function isNumber(num: string): boolean {
   return !isNaN(parseFloat(num)) && isFinite(parseFloat(num))
@@ -72,15 +73,22 @@ router.post('/', async (req: Request, res: Response) => {
   try {
     const user: UserBody = req.body
 
-    if (!user.name) {
+    if (!(user.email && user.password)) {
       throw new PropertyRequiredError(ResponseMessages.EMPTY_FIELDS)
     }
 
+    const generatedPassword = ''
+
     // Create the user and return it
-    const result: DatabaseResponse<User[]> = await repo.createUser(user.name)
+    const result: DatabaseResponse<User[]> = await repo.createUser(
+      user.email,
+      user.password
+    )
     formatSuccessResponse(res, 200, result)
   } catch (error) {
     if (error instanceof PropertyRequiredError) {
+      formatErrorResponse(res, 400, error.message)
+    } else if (error instanceof UserAlreadyExist) {
       formatErrorResponse(res, 400, error.message)
     } else {
       formatErrorResponse(res, 500, ResponseMessages.SERVER_ERROR)
@@ -102,7 +110,7 @@ router.put('/:id', async (req: Request, res: Response) => {
     const id: number = parseInt(req.params.id)
     const user: User = req.body
 
-    if (!(user.id && user.name)) {
+    if (!(user.id && user.email)) {
       throw new PropertyRequiredError(ResponseMessages.EMPTY_FIELDS)
     }
 

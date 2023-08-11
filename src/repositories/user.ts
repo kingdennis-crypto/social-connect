@@ -1,5 +1,5 @@
 import { ResponseMessages } from '@/enums'
-import { NotFound } from '@/errors'
+import { NotFound, UserAlreadyExist } from '@/errors'
 import { DatabaseResponse, User } from '@/types'
 import LoggerService from '@/utilities/services/logger'
 import DatabaseService from '@/utilities/services/database'
@@ -23,6 +23,7 @@ export default class UserRepo extends DatabaseService {
    */
   async getAll(): Promise<DatabaseResponse<User[]>> {
     try {
+      // TODO: Make toggle to return the password
       return await super.queryDB<User[]>('SELECT * FROM users')
     } catch (error: unknown) {
       logger.error((error as Error).message)
@@ -61,15 +62,42 @@ export default class UserRepo extends DatabaseService {
   }
 
   /**
-   * Creates a new user in the database.
-   * @param {string} name - The name of the user to create.
-   * @returns {Promise<DatabaseResponse<User[]>>} A Promise containing the created user.
+   * Retrieves a user by their email.
+   * @param {string} email - The email of the user to retrieve.
+   * @returns {Promise<DatabaseResponse<User[]>>} A promise containing the user.
    */
-  async createUser(name: string): Promise<DatabaseResponse<User[]>> {
+  async getUserByEmail(email: string): Promise<DatabaseResponse<User[]>> {
     try {
       return await super.queryDBWithValues<User[]>(
-        'INSERT INTO users (name) values ($1) RETURNING id, name',
-        [name]
+        'SELECT * FROM users WHERE email = $1',
+        [email]
+      )
+    } catch (error: unknown) {
+      logger.error((error as Error).message)
+      throw error
+    }
+  }
+
+  /**
+   * Creates a new user in the database.
+   * @param {string} email - The email of the user to create.
+   * @param {string} password - The password of the user to create.
+   * @returns {Promise<DatabaseResponse<User[]>>} A Promise containing the created user.
+   */
+  async createUser(
+    email: string,
+    password: string
+  ): Promise<DatabaseResponse<User[]>> {
+    try {
+      const user = await this.getUserByEmail(email)
+
+      if (user.count > 0) {
+        throw new UserAlreadyExist(ResponseMessages.USER_EXISTS)
+      }
+
+      return await super.queryDBWithValues<User[]>(
+        'INSERT INTO users (email, password) values ($1, $2) RETURNING id, email',
+        [email, password]
       )
     } catch (error: unknown) {
       logger.error((error as Error).message)
@@ -89,7 +117,7 @@ export default class UserRepo extends DatabaseService {
 
       // Delete the user
       return await super.queryDBWithValues<User[]>(
-        'DELETE FROM users WHERE id=$1 RETURNING id, name',
+        'DELETE FROM users WHERE id=$1 RETURNING id, email',
         [id]
       )
     } catch (error: unknown) {
@@ -111,8 +139,8 @@ export default class UserRepo extends DatabaseService {
 
       // Update the user object
       return await super.queryDBWithValues<User[]>(
-        'UPDATE users SET name=$1 WHERE id=$2 RETURNING id, name',
-        [user.name, id]
+        'UPDATE users SET email=$1 WHERE id=$2 RETURNING id, email',
+        [user.email, id]
       )
     } catch (error: unknown) {
       logger.error((error as Error).message)
