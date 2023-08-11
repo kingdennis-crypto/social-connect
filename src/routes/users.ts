@@ -32,7 +32,7 @@ function isNumber(num: string): boolean {
 router.get('/', async (req: Request, res: Response) => {
   try {
     const users: DatabaseResponse<User[]> = await repo.getAll()
-    res.status(200).json(formatSuccessResponse(200, users))
+    formatSuccessResponse(res, 200, users)
   } catch (error) {
     console.error('Error:', error)
     formatErrorResponse(res, 500, 'Internal server error')
@@ -52,7 +52,7 @@ router.get('/:id', async (req: Request, res: Response) => {
 
     const id: number = parseInt(req.params.id)
     const result: DatabaseResponse<User[]> = await repo.getById(id)
-    res.status(200).json(formatSuccessResponse(200, result))
+    formatSuccessResponse(res, 200, result)
   } catch (error) {
     if (error instanceof InvalidId) {
       formatErrorResponse(res, 400, error.message)
@@ -77,7 +77,7 @@ router.post('/', async (req: Request, res: Response) => {
 
     // Create the user and return it
     const result: DatabaseResponse<User[]> = await repo.createUser(user.name)
-    res.status(200).json(formatSuccessResponse(200, result))
+    formatSuccessResponse(res, 200, result)
   } catch (error) {
     if (error instanceof PropertyRequiredError) {
       formatErrorResponse(res, 400, error.message)
@@ -111,7 +111,7 @@ router.put('/:id', async (req: Request, res: Response) => {
 
     // Update the user and return the returned data
     const result: DatabaseResponse<User[]> = await repo.updateUser(id, user)
-    res.status(200).json(formatSuccessResponse(200, result))
+    formatSuccessResponse(res, 200, result)
   } catch (error: unknown) {
     if (error instanceof InvalidId) {
       formatErrorResponse(res, 400, error.message)
@@ -141,7 +141,7 @@ router.delete('/:id', async (req: Request, res: Response) => {
     const id: number = parseInt(req.params.id)
 
     const result: DatabaseResponse<User[]> = await repo.deleteUser(id)
-    res.status(200).json(formatSuccessResponse(200, result))
+    formatSuccessResponse(res, 200, result)
   } catch (error) {
     if (error instanceof InvalidId) {
       formatErrorResponse(res, 400, error.message)
