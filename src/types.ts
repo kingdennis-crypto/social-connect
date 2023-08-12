@@ -12,6 +12,8 @@ export type SuccessResponse<T> = {
   payload: DatabaseResponse<T>
 }
 
+export type ObjectValues<T> = T[keyof T]
+
 /**
  * MODELS
  */
@@ -19,4 +21,10 @@ export type User = {
   id: number
   email: string
   password: string
+}
+
+export type DecodedToken = {
+  foo: string
+  iat: number
+  exp: number
 }
