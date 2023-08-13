@@ -50,7 +50,7 @@ export async function isAuthenticated(
       formatErrorResponse(res, 400, (error as Error).message)
     } else {
       logger.error((error as Error).message)
-      formatErrorResponse(res, 500, RESPONSE_MESSAGES.SERVER_ERROR)
+      formatErrorResponse(res, 500, (error as Error).message)
     }
   }
 }
@@ -86,3 +86,19 @@ export async function isAdmin(
     }
   }
 }
+
+// export async function isOwnUser(
+//   req: Request,
+//   res: Response,
+//   next: NextFunction
+// ) {
+//   try {
+//     // Get the token from the local state
+//     const decodedToken: DecodedToken = res.locals.decodedToken
+
+//     return next()
+//   } catch (error) {
+//     logger.error((error as Error).message)
+//     formatErrorResponse(res, 500, RESPONSE_MESSAGES.SERVER_ERROR)
+//   }
+// }

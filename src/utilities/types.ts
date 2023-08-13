@@ -24,6 +24,15 @@ export type User = {
   role: UserRole
 }
 
+export type Post = {
+  post_id: number
+  user_id: number
+  content: string
+  media_url?: string
+  timestamp: string
+  is_public: boolean
+}
+
 export type DecodedToken = {
   iat: number
   exp: number

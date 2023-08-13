@@ -20,6 +20,8 @@ export const RESPONSE_MESSAGES = {
   NO_TOKEN: 'No token is provided',
   INVALID_TOKEN: 'This token is invalid',
   NO_ADMIN: "You're not a admin",
+  RESOURCE_NOT_FOUND: 'The resource was not found',
+  NOT_THE_OWNER: "You're not the owner",
 } as const
 
 type ObjectValues<T> = T[keyof T];

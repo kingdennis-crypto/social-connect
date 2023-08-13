@@ -9,37 +9,34 @@ class BaseError extends Error {
   }
 }
 
+/* Error indicating an invalid ID */
 export class InvalidId extends BaseError {}
 
+/* Error indicating that a user already exists */
 export class UserAlreadyExist extends BaseError {}
 
+/* Error indicating invalid login credentials */
 export class InvalidLoginCredentials extends BaseError {}
 
+/* Error indicating unauthenticated access */
 export class Unauthenticated extends BaseError {}
 
+/* Error indicating an invalid token */
 export class InvalidToken extends BaseError {}
 
+/* Error indicating an invalid role */
 export class InvalidRole extends BaseError {}
 
-/**
- * Error class indicating that the resource was not found
- * @class
- * @extends BaseError
- */
+/* Error indicating access not allowed for the current owner */
+export class NotTheOwner extends BaseError {}
+
+/* Error indicating that the resource was not found*/
 export class NotFound extends BaseError {}
 
-/**
- * Error class indicating a validation error
- * @class
- * @extends BaseError
- */
+/* Error indicating a validation error */
 export class ValidationError extends BaseError {}
 
-/**
- * Error class indicating that a property required for validation is missing
- * @class
- * @extends
- */
+/* Error indicating that a property required for validation is missing */
 export class PropertyRequiredError extends ValidationError {
   fields: string[]
 
