@@ -4,6 +4,8 @@ import LoggerService from '@/utilities/services/logger'
 const loggerService = LoggerService.getInstance()
 const logger = loggerService.getLogger()
 
+// TODO: When no connection is present no route works. Make error handling for if there is no connection
+
 /**
  * A singleton class that initializes a connection with Postgres for dependency injection
  * @class
@@ -44,7 +46,7 @@ export default class ConnectionService {
       await this.client.connect()
       logger.info('Connected to the database')
     } catch (error) {
-      logger.error('Database connection error:', error)
+      logger.error('Database connection error: %s', (error as Error).message)
     }
   }
 
@@ -53,7 +55,7 @@ export default class ConnectionService {
       this.client.end()
       logger.info('Disconnected from the database')
     } catch (error) {
-      logger.error('Database connection error:', error)
+      logger.error('Database connection error:', (error as Error).message)
     }
   }
 

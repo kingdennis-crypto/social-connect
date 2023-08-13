@@ -14,7 +14,7 @@ import {
   UserAlreadyExist,
 } from '@/errors'
 
-import { ResponseMessages } from '@/enums'
+import { RESPONSE_MESSAGES, ResponseMessages } from '@/enums'
 import EncryptionHelper from '@/utilities/helpers/encryption'
 
 const router: Router = express.Router()
@@ -63,7 +63,7 @@ router.get('/:id', async (req: Request, res: Response) => {
     } else if (error instanceof NotFound) {
       formatErrorResponse(res, 400, error.message)
     } else {
-      formatErrorResponse(res, 500, ResponseMessages.SERVER_ERROR)
+      formatErrorResponse(res, 500, RESPONSE_MESSAGES.SERVER_ERROR)
     }
   }
 })
