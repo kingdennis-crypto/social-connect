@@ -1,7 +1,7 @@
 // import { v4 as uuidv4 } from 'uuid'
 import LoggerService from '../services/logger'
 import jwt from 'jsonwebtoken'
-import { DecodedToken } from '@/types'
+import { DecodedToken } from '@/utilities/types'
 
 const loggerService = LoggerService.getInstance()
 const logger = loggerService.getLogger()

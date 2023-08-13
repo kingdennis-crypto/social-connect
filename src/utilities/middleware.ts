@@ -2,8 +2,8 @@ import { Request, Response, NextFunction } from 'express'
 import TokenHelper from '@/utilities/helpers/token'
 import { InvalidToken, Unauthenticated } from './errors'
 import { RESPONSE_MESSAGES } from './enums'
-import LoggerService from './utilities/services/logger'
-import { formatErrorResponse } from './utilities/helpers/response'
+import LoggerService from '@/utilities/services/logger'
+import { formatErrorResponse } from '@/utilities/helpers/response'
 import { JsonWebTokenError } from 'jsonwebtoken'
 
 const loggerService = LoggerService.getInstance()

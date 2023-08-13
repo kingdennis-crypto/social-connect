@@ -1,6 +1,6 @@
 import express, { Request, Response, Router } from 'express'
 import UserRepo from '@/repositories/user'
-import type { DatabaseResponse, User } from '@/types'
+import type { DatabaseResponse, User } from '@/utilities/types'
 import {
   formatErrorResponse,
   formatSuccessResponse,
@@ -12,9 +12,9 @@ import {
   NotFound,
   InvalidId,
   UserAlreadyExist,
-} from '@/errors'
+} from '@/utilities/errors'
 
-import { RESPONSE_MESSAGES, ResponseMessages } from '@/enums'
+import { RESPONSE_MESSAGES, ResponseMessages } from '@/utilities/enums'
 import EncryptionHelper from '@/utilities/helpers/encryption'
 
 const router: Router = express.Router()

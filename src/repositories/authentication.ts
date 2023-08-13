@@ -1,9 +1,9 @@
 import DatabaseService from '@/utilities/services/database'
-import type { DatabaseResponse, User } from '@/types'
+import type { DatabaseResponse, User } from '@/utilities/types'
 import LoggerService from '@/utilities/services/logger'
 import EncryptionHelper from '@/utilities/helpers/encryption'
-import { InvalidLoginCredentials } from '@/errors'
-import { ResponseMessages } from '@/enums'
+import { InvalidLoginCredentials } from '@/utilities/errors'
+import { ResponseMessages } from '@/utilities/enums'
 
 const loggerService = LoggerService.getInstance()
 const logger = loggerService.getLogger()

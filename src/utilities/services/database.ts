@@ -1,4 +1,4 @@
-import { DatabaseResponse } from '@/types'
+import { DatabaseResponse } from '@/utilities/types'
 import ConnectionService from '@/utilities/services/connection'
 import { Client, QueryResult } from 'pg'
 import { formatDBObject } from '../helpers/return'

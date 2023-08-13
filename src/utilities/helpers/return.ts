@@ -1,4 +1,4 @@
-import { DatabaseResponse } from '@/types'
+import { DatabaseResponse } from '@/utilities/types'
 import { QueryResult } from 'pg'
 
 /**

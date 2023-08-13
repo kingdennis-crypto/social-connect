@@ -1,6 +1,6 @@
-import { ResponseMessages } from '@/enums'
-import { NotFound, UserAlreadyExist } from '@/errors'
-import { DatabaseResponse, User } from '@/types'
+import { ResponseMessages } from '@/utilities/enums'
+import { NotFound, UserAlreadyExist } from '@/utilities/errors'
+import { DatabaseResponse, User } from '@/utilities/types'
 import LoggerService from '@/utilities/services/logger'
 import DatabaseService from '@/utilities/services/database'
 

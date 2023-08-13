@@ -1,4 +1,4 @@
-import type { User } from '@/types'
+import type { User } from '@/utilities/types'
 import express, { Router, Request, Response } from 'express'
 // import EncryptionHelper from '@/utilities/helpers/encryption'
 import AuthenticationRepo from '@/repositories/authentication'
@@ -7,8 +7,8 @@ import {
   formatErrorResponse,
   formatSuccessResponse,
 } from '@/utilities/helpers/response'
-import { ResponseMessages } from '@/enums'
-import { InvalidLoginCredentials } from '@/errors'
+import { ResponseMessages } from '@/utilities/enums'
+import { InvalidLoginCredentials } from '@/utilities/errors'
 
 const router: Router = express.Router()
 const repo: AuthenticationRepo = new AuthenticationRepo()

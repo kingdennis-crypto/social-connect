@@ -1,5 +1,5 @@
 import { Response } from 'express'
-import { DatabaseResponse } from '@/types'
+import { DatabaseResponse } from '@/utilities/types'
 
 export function formatSuccessResponse<T>(
   response: Response,
