@@ -21,8 +21,17 @@ router.post('/', async (req: Request, res: Response) => {
     const user: UserBody = req.body
 
     // Validate the user
-    await repo.authenticateUser(user.email, user.password)
-    const token: string = await TokenHelper.getToken()
+    const authenticatedUser = await repo.authenticateUser(
+      user.email,
+      user.password
+    )
+    const tokenPayload = {
+      id: authenticatedUser.id,
+      email: authenticatedUser.email,
+      role: authenticatedUser.role,
+    }
+
+    const token: string = await TokenHelper.getToken(tokenPayload)
     const headers = { Authorization: `Bearer ${token}` }
 
     // Return the token

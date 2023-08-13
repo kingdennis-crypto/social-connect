@@ -18,7 +18,8 @@ export const RESPONSE_MESSAGES = {
   SERVER_ERROR: 'Internal server error',
   NOT_AUTHENTICATED: "You're not authenticated",
   NO_TOKEN: 'No token is provided',
-  INVALID_TOKEN: 'This token is invalid'
+  INVALID_TOKEN: 'This token is invalid',
+  NO_ADMIN: "You're not a admin",
 } as const
 
 type ObjectValues<T> = T[keyof T];

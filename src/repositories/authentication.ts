@@ -25,7 +25,7 @@ export default class AuthenticationRepo extends DatabaseService {
    * @returns {Promise<boolean>} - Returns true if authentication is successful, false otherwise
    * @throws {InvalidLoginCredentials} - Throws an error if authentication fails
    */
-  async authenticateUser(email: string, password: string): Promise<boolean> {
+  async authenticateUser(email: string, password: string): Promise<User> {
     try {
       const result: DatabaseResponse<User[]> = await super.queryDBWithValues(
         'SELECT * FROM users where email = $1',
@@ -51,7 +51,7 @@ export default class AuthenticationRepo extends DatabaseService {
         )
       }
 
-      return isValid
+      return result.data[0]
     } catch (error) {
       logger.error((error as Error).message)
       throw error

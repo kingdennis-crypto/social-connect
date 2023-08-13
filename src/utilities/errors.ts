@@ -19,6 +19,8 @@ export class Unauthenticated extends BaseError {}
 
 export class InvalidToken extends BaseError {}
 
+export class InvalidRole extends BaseError {}
+
 /**
  * Error class indicating that the resource was not found
  * @class

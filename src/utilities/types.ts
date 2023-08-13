@@ -21,10 +21,15 @@ export type User = {
   id: number
   email: string
   password: string
+  role: UserRole
 }
 
 export type DecodedToken = {
-  foo: string
   iat: number
   exp: number
+  role: UserRole
+  id: number
+  email: string
 }
+
+export type UserRole = 'admin' | 'user'

@@ -1,10 +1,11 @@
 import { Request, Response, NextFunction } from 'express'
 import TokenHelper from '@/utilities/helpers/token'
-import { InvalidToken, Unauthenticated } from './errors'
+import { InvalidRole, InvalidToken, Unauthenticated } from './errors'
 import { RESPONSE_MESSAGES } from './enums'
 import LoggerService from '@/utilities/services/logger'
 import { formatErrorResponse } from '@/utilities/helpers/response'
 import { JsonWebTokenError } from 'jsonwebtoken'
+import { DecodedToken } from './types'
 
 const loggerService = LoggerService.getInstance()
 const logger = loggerService.getLogger()
@@ -35,15 +36,50 @@ export async function isAuthenticated(
       throw new InvalidToken(RESPONSE_MESSAGES.INVALID_TOKEN)
     }
 
-    // If the token is valid, call next function
+    // Store the decoded token into the request
+    res.locals.decodedToken = TokenHelper.decodeToken(token)
+
+    // If the token is valid, call the next function
     return next()
   } catch (error: unknown) {
     if (error instanceof Unauthenticated) {
-      formatErrorResponse(res, 500, (error as Error).message)
+      formatErrorResponse(res, 400, (error as Error).message)
     } else if (error instanceof InvalidToken) {
-      formatErrorResponse(res, 500, (error as Error).message)
+      formatErrorResponse(res, 400, (error as Error).message)
     } else if (error instanceof JsonWebTokenError) {
-      formatErrorResponse(res, 500, (error as Error).message)
+      formatErrorResponse(res, 400, (error as Error).message)
+    } else {
+      logger.error((error as Error).message)
+      formatErrorResponse(res, 500, RESPONSE_MESSAGES.SERVER_ERROR)
+    }
+  }
+}
+
+/**
+ * Middleware to check if a user is a admin
+ * @param {Request} req - The express request object
+ * @param {Response} res - The express response object
+ * @param {NextFunction} next - The next middleware function
+ * @returns {Promise<void>} - A promise that resolves once the middleware completes
+ */
+export async function isAdmin(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    // Get the token from the local store
+    const decodedToken: DecodedToken = res.locals.decodedToken
+
+    if (decodedToken.role === 'user') {
+      throw new InvalidRole(RESPONSE_MESSAGES.NO_ADMIN)
+    }
+
+    // If the user is a admin, call the next function
+    return next()
+  } catch (error) {
+    if (error instanceof InvalidRole) {
+      formatErrorResponse(res, 400, (error as Error).message)
     } else {
       logger.error((error as Error).message)
       formatErrorResponse(res, 500, RESPONSE_MESSAGES.SERVER_ERROR)
