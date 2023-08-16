@@ -1,10 +1,11 @@
 import PostRepo from '@/repositories/post'
-import { RESPONSE_MESSAGES } from '@/utilities/enums'
+import { RESPONSE_MESSAGES } from '@/utilities/constants'
 import { PropertyRequiredError } from '@/utilities/errors'
 import {
   formatErrorResponse,
   formatSuccessResponse,
 } from '@/utilities/helpers/response'
+import upload from '@/utilities/helpers/upload'
 import { isAuthenticated } from '@/utilities/middleware'
 import { DatabaseResponse, DecodedToken, Post } from '@/utilities/types'
 import express, { Request, Response, Router } from 'express'
@@ -62,6 +63,19 @@ router.delete(
       const deletedPost = await repo.deletePost(postId, decodedToken.id)
 
       formatSuccessResponse(res, 200, deletedPost)
+    } catch (error) {
+      formatErrorResponse(res, 500, (error as Error).message)
+    }
+  }
+)
+
+router.post(
+  '/media',
+  isAuthenticated,
+  upload.array('file'),
+  async (req: Request, res: Response) => {
+    try {
+      formatSuccessResponse(res, 200, { count: 0, data: 'Good job' })
     } catch (error) {
       formatErrorResponse(res, 500, (error as Error).message)
     }
