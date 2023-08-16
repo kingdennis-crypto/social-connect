@@ -1,4 +1,4 @@
-import { ResponseMessages } from '@/utilities/enums'
+import { RESPONSE_MESSAGES } from '@/utilities/constants'
 import { NotFound, UserAlreadyExist } from '@/utilities/errors'
 import { DatabaseResponse, User } from '@/utilities/types'
 import LoggerService from '@/utilities/services/logger'
@@ -46,13 +46,13 @@ export default class UserRepo extends DatabaseService {
 
       // If the user doesn't exist throw error
       if (user.count === 0) {
-        throw new NotFound(ResponseMessages.USER_NOT_FOUND)
+        throw new NotFound(RESPONSE_MESSAGES.NOT_FOUND.USER)
       }
 
       return user
     } catch (error: unknown) {
       if (error instanceof NotFound) {
-        logger.error(ResponseMessages.USER_NOT_FOUND)
+        logger.error(RESPONSE_MESSAGES.NOT_FOUND.USER)
       } else {
         logger.error((error as Error).message)
       }
@@ -92,7 +92,7 @@ export default class UserRepo extends DatabaseService {
       const user = await this.getUserByEmail(email)
 
       if (user.count > 0) {
-        throw new UserAlreadyExist(ResponseMessages.USER_EXISTS)
+        throw new UserAlreadyExist(RESPONSE_MESSAGES.CONTENT.USER_EXISTS)
       }
 
       return await super.queryDBWithValues<User[]>(

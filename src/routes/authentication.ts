@@ -7,7 +7,7 @@ import {
   formatErrorResponse,
   formatSuccessResponse,
 } from '@/utilities/helpers/response'
-import { ResponseMessages } from '@/utilities/enums'
+import { RESPONSE_MESSAGES } from '@/utilities/constants'
 import { InvalidLoginCredentials, NoProfile } from '@/utilities/errors'
 
 const router: Router = express.Router()
@@ -46,7 +46,7 @@ router.post('/', async (req: Request, res: Response) => {
     } else if (error instanceof NoProfile) {
       formatErrorResponse(res, 400, error.message)
     } else {
-      formatErrorResponse(res, 500, ResponseMessages.SERVER_ERROR)
+      formatErrorResponse(res, 500, RESPONSE_MESSAGES.SERVER_ERROR)
     }
   }
 })

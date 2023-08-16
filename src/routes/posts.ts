@@ -31,7 +31,7 @@ router.post(
       const body: Post = req.body
 
       if (!body.content) {
-        throw new PropertyRequiredError(RESPONSE_MESSAGES.EMPTY_FIELDS)
+        throw new PropertyRequiredError(RESPONSE_MESSAGES.CONTENT.EMPTY_FIELDS)
       }
 
       const result: DatabaseResponse<Post[]> = await repo.createPost(

@@ -1,4 +1,4 @@
-import { RESPONSE_MESSAGES } from '@/utilities/enums'
+import { RESPONSE_MESSAGES } from '@/utilities/constants'
 import { NotFound } from '@/utilities/errors'
 import DatabaseService from '@/utilities/services/database'
 import LoggerService from '@/utilities/services/logger'

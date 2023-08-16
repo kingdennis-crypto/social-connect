@@ -1,4 +1,4 @@
-import { RESPONSE_MESSAGES } from '@/utilities/enums'
+import { RESPONSE_MESSAGES } from '@/utilities/constants'
 import { NotFound, NotTheOwner } from '@/utilities/errors'
 import DatabaseService from '@/utilities/services/database'
 import LoggerService from '@/utilities/services/logger'
@@ -46,13 +46,13 @@ export default class PostRepo extends DatabaseService {
 
       // If the post doesn't exists, throw error
       if (post.count === 0) {
-        throw new NotFound(RESPONSE_MESSAGES.RESOURCE_NOT_FOUND)
+        throw new NotFound(RESPONSE_MESSAGES.NOT_FOUND.RESOURCE)
       }
 
       return post
     } catch (error: unknown) {
       if (error instanceof NotFound) {
-        logger.error(RESPONSE_MESSAGES.RESOURCE_NOT_FOUND)
+        logger.error(RESPONSE_MESSAGES.NOT_FOUND.RESOURCE)
       } else {
         logger.error((error as Error).message)
       }
@@ -91,7 +91,7 @@ export default class PostRepo extends DatabaseService {
 
       // Check if the user id is the same as the owner of the post
       if (post.user_id !== userId) {
-        throw new NotTheOwner(RESPONSE_MESSAGES.NOT_THE_OWNER)
+        throw new NotTheOwner(RESPONSE_MESSAGES.CONTENT.NOT_THE_OWNER)
       }
 
       // Delete the post

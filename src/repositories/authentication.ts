@@ -3,7 +3,7 @@ import type { DatabaseResponse, Profile, User } from '@/utilities/types'
 import LoggerService from '@/utilities/services/logger'
 import EncryptionHelper from '@/utilities/helpers/encryption'
 import { InvalidLoginCredentials, NoProfile } from '@/utilities/errors'
-import { RESPONSE_MESSAGES, ResponseMessages } from '@/utilities/enums'
+import { RESPONSE_MESSAGES } from '@/utilities/constants'
 
 const loggerService = LoggerService.getInstance()
 const logger = loggerService.getLogger()
@@ -35,7 +35,7 @@ export default class AuthenticationRepo extends DatabaseService {
       // If no user exists, return false
       if (result.count === 0) {
         throw new InvalidLoginCredentials(
-          ResponseMessages.INVALID_LOGIN_CREDENTIALS
+          RESPONSE_MESSAGES.AUTHORIZATION.INVALID_LOGIN_CREDENTIALS
         )
       }
 
@@ -47,7 +47,7 @@ export default class AuthenticationRepo extends DatabaseService {
 
       if (!isValid) {
         throw new InvalidLoginCredentials(
-          ResponseMessages.INVALID_LOGIN_CREDENTIALS
+          RESPONSE_MESSAGES.AUTHORIZATION.INVALID_LOGIN_CREDENTIALS
         )
       }
 
@@ -66,7 +66,7 @@ export default class AuthenticationRepo extends DatabaseService {
       )
 
       if (result.count === 0) {
-        throw new NoProfile(RESPONSE_MESSAGES.NO_PROFILE)
+        throw new NoProfile(RESPONSE_MESSAGES.NOT_FOUND.PROFILE)
       }
 
       return result

@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
 import TokenHelper from '@/utilities/helpers/token'
 import { InvalidRole, InvalidToken, Unauthenticated } from './errors'
-import { RESPONSE_MESSAGES } from './enums'
+import { RESPONSE_MESSAGES } from './constants'
 import LoggerService from '@/utilities/services/logger'
 import { formatErrorResponse } from '@/utilities/helpers/response'
 import { JsonWebTokenError } from 'jsonwebtoken'
@@ -26,14 +26,14 @@ export async function isAuthenticated(
     const token: string | undefined = req.headers.authorization?.split(' ')[1]
 
     if (!token) {
-      throw new Unauthenticated(RESPONSE_MESSAGES.NO_TOKEN)
+      throw new Unauthenticated(RESPONSE_MESSAGES.TOKEN.NO_TOKEN_PROVIDED)
     }
 
     // Verify the validity of the token
     const isValidToken = await TokenHelper.verifyToken(token)
 
     if (!isValidToken) {
-      throw new InvalidToken(RESPONSE_MESSAGES.INVALID_TOKEN)
+      throw new InvalidToken(RESPONSE_MESSAGES.TOKEN.INVALID_TOKEN)
     }
 
     // Store the decoded token into the request
@@ -72,7 +72,7 @@ export async function isAdmin(
     const decodedToken: DecodedToken = res.locals.decodedToken
 
     if (decodedToken.role === 'user') {
-      throw new InvalidRole(RESPONSE_MESSAGES.NO_ADMIN)
+      throw new InvalidRole(RESPONSE_MESSAGES.AUTHORIZATION.NO_ADMIN)
     }
 
     // If the user is a admin, call the next function
