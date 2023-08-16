@@ -1,9 +1,9 @@
 import DatabaseService from '@/utilities/services/database'
-import type { DatabaseResponse, User } from '@/utilities/types'
+import type { DatabaseResponse, Profile, User } from '@/utilities/types'
 import LoggerService from '@/utilities/services/logger'
 import EncryptionHelper from '@/utilities/helpers/encryption'
-import { InvalidLoginCredentials } from '@/utilities/errors'
-import { ResponseMessages } from '@/utilities/enums'
+import { InvalidLoginCredentials, NoProfile } from '@/utilities/errors'
+import { RESPONSE_MESSAGES, ResponseMessages } from '@/utilities/enums'
 
 const loggerService = LoggerService.getInstance()
 const logger = loggerService.getLogger()
@@ -52,7 +52,25 @@ export default class AuthenticationRepo extends DatabaseService {
       }
 
       return result.data[0]
-    } catch (error) {
+    } catch (error: unknown) {
+      logger.error((error as Error).message)
+      throw error
+    }
+  }
+
+  async userHasProfile(userId: number): Promise<unknown> {
+    try {
+      const result: DatabaseResponse<Profile> = await super.queryDBWithValues(
+        'SELECT * FROM profile WHERE user_id = $1',
+        [userId]
+      )
+
+      if (result.count === 0) {
+        throw new NoProfile(RESPONSE_MESSAGES.NO_PROFILE)
+      }
+
+      return result
+    } catch (error: unknown) {
       logger.error((error as Error).message)
       throw error
     }

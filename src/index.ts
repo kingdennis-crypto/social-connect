@@ -17,6 +17,7 @@ const PORT: number = (process.env.PORT as unknown as number) || 3000
 import UserRoutes from '@/routes/users'
 import AuthenticationRoutes from '@/routes/authentication'
 import PostRoutes from '@/routes/posts'
+import ProfileRoutes from '@/routes/profiles'
 
 // Initialize connection service
 ConnectionService.getInstance()
@@ -36,6 +37,7 @@ APP.use(cors())
 APP.use('/users', UserRoutes)
 APP.use('/authentication', AuthenticationRoutes)
 APP.use('/posts', PostRoutes)
+APP.use('/profile', ProfileRoutes)
 
 APP.listen(PORT, (): void => {
   logger.info('Server is listening at port: %d', PORT)

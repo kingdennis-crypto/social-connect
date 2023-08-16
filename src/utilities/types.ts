@@ -1,3 +1,6 @@
+type ErrorModule = typeof import('@/utilities/errors')
+export type Error = ErrorModule[keyof ErrorModule]
+
 /**
  * UTILITITES
  */
@@ -13,6 +16,11 @@ export type SuccessResponse<T> = {
 }
 
 export type ObjectValues<T> = T[keyof T]
+
+// Function to view all inheritted types
+export type Prettify<T> = {
+  [K in keyof T]: T[K]
+}
 
 /**
  * MODELS
@@ -33,6 +41,14 @@ export type Post = {
   is_public: boolean
 }
 
+export type Profile = {
+  profile_id: number
+  user_id: number
+  username: string
+  bio: string
+  profile_image: string
+}
+
 export type DecodedToken = {
   iat: number
   exp: number
@@ -40,5 +56,9 @@ export type DecodedToken = {
   id: number
   email: string
 }
+
+export type UserInnerJoinProfile = Prettify<
+  Profile & Pick<User, 'email' | 'role'>
+>
 
 export type UserRole = 'admin' | 'user'

@@ -36,6 +36,8 @@ export class NotFound extends BaseError {}
 /* Error indicating a validation error */
 export class ValidationError extends BaseError {}
 
+export class NoProfile extends BaseError {}
+
 /* Error indicating that a property required for validation is missing */
 export class PropertyRequiredError extends ValidationError {
   fields: string[]

@@ -22,6 +22,10 @@ export const RESPONSE_MESSAGES = {
   NO_ADMIN: "You're not a admin",
   RESOURCE_NOT_FOUND: 'The resource was not found',
   NOT_THE_OWNER: "You're not the owner",
+  NO_PROFILE: "This user doesn't have a profile (yet)",
+  NOT_FOUND: {
+    PROFILE: "This profile wasn't found",
+  },
 } as const
 
 type ObjectValues<T> = T[keyof T];

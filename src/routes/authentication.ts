@@ -8,7 +8,7 @@ import {
   formatSuccessResponse,
 } from '@/utilities/helpers/response'
 import { ResponseMessages } from '@/utilities/enums'
-import { InvalidLoginCredentials } from '@/utilities/errors'
+import { InvalidLoginCredentials, NoProfile } from '@/utilities/errors'
 
 const router: Router = express.Router()
 const repo: AuthenticationRepo = new AuthenticationRepo()
@@ -18,6 +18,7 @@ type UserBody = Omit<User, 'id'>
 
 router.post('/', async (req: Request, res: Response) => {
   try {
+    // TODO: Make a check to see if the user already has a profile
     const user: UserBody = req.body
 
     // Validate the user
@@ -25,6 +26,9 @@ router.post('/', async (req: Request, res: Response) => {
       user.email,
       user.password
     )
+
+    await repo.userHasProfile(authenticatedUser.id)
+
     const tokenPayload = {
       id: authenticatedUser.id,
       email: authenticatedUser.email,
@@ -38,7 +42,9 @@ router.post('/', async (req: Request, res: Response) => {
     formatSuccessResponse(res, 200, null, headers)
   } catch (error: unknown) {
     if (error instanceof InvalidLoginCredentials) {
-      formatErrorResponse(res, 400, ResponseMessages.INVALID_LOGIN_CREDENTIALS)
+      formatErrorResponse(res, 400, error.message)
+    } else if (error instanceof NoProfile) {
+      formatErrorResponse(res, 400, error.message)
     } else {
       formatErrorResponse(res, 500, ResponseMessages.SERVER_ERROR)
     }
