@@ -1,21 +1,30 @@
-import express, { Request, Response, Router } from 'express'
-import UserRepo from '@/repositories/user'
-import type { DatabaseResponse, User } from '@/utilities/types'
+// Types
+import type { Request, Response, Router } from 'express'
+import type { DatabaseResponse } from '@/utilities/types/utilities.type'
+import type { User } from '@/utilities/types/models.type'
+
+// Repos
+import UserRepo from '@/repositories/user.repo'
+
+// Helpers
+import EncryptionHelper from '@/utilities/helpers/encryption'
+
+// Error Handling
+import { RESPONSE_MESSAGES } from '@/utilities/constants'
 import {
   formatErrorResponse,
   formatSuccessResponse,
 } from '@/utilities/helpers/response'
 
+// Other
+import express from 'express'
+
 import {
   ValidationError,
   PropertyRequiredError,
-  NotFound,
   InvalidId,
-  UserAlreadyExist,
 } from '@/utilities/errors'
-
-import { RESPONSE_MESSAGES } from '@/utilities/constants'
-import EncryptionHelper from '@/utilities/helpers/encryption'
+import BaseError from '@/utilities/errors/base.error'
 
 const router: Router = express.Router()
 const userRepo: UserRepo = new UserRepo()
@@ -38,8 +47,12 @@ router.get('/', async (req: Request, res: Response) => {
   try {
     const users: DatabaseResponse<User[]> = await userRepo.getAll()
     formatSuccessResponse(res, 200, users)
-  } catch (error) {
-    formatErrorResponse(res, 500, RESPONSE_MESSAGES.SERVER_ERROR)
+  } catch (error: unknown) {
+    if (error instanceof BaseError) {
+      formatErrorResponse(res, error.statusCode, error.message)
+    } else {
+      formatErrorResponse(res, 500, (error as Error).message)
+    }
   }
 })
 
@@ -57,13 +70,11 @@ router.get('/:id', async (req: Request, res: Response) => {
     const id: number = parseInt(req.params.id)
     const result: DatabaseResponse<User[]> = await userRepo.getById(id)
     formatSuccessResponse(res, 200, result)
-  } catch (error) {
-    if (error instanceof InvalidId) {
-      formatErrorResponse(res, 400, error.message)
-    } else if (error instanceof NotFound) {
-      formatErrorResponse(res, 400, error.message)
+  } catch (error: unknown) {
+    if (error instanceof BaseError) {
+      formatErrorResponse(res, error.statusCode, error.message)
     } else {
-      formatErrorResponse(res, 500, RESPONSE_MESSAGES.SERVER_ERROR)
+      formatErrorResponse(res, 500, (error as Error).message)
     }
   }
 })
@@ -96,12 +107,10 @@ router.post('/', async (req: Request, res: Response) => {
     )
     formatSuccessResponse(res, 200, result)
   } catch (error) {
-    if (error instanceof PropertyRequiredError) {
-      formatErrorResponse(res, 400, error.message)
-    } else if (error instanceof UserAlreadyExist) {
-      formatErrorResponse(res, 400, error.message)
+    if (error instanceof BaseError) {
+      formatErrorResponse(res, error.statusCode, error.message)
     } else {
-      formatErrorResponse(res, 500, RESPONSE_MESSAGES.SERVER_ERROR)
+      formatErrorResponse(res, 500, (error as Error).message)
     }
   }
 })
@@ -132,16 +141,10 @@ router.put('/:id', async (req: Request, res: Response) => {
     const result: DatabaseResponse<User[]> = await userRepo.updateUser(id, user)
     formatSuccessResponse(res, 200, result)
   } catch (error: unknown) {
-    if (error instanceof InvalidId) {
-      formatErrorResponse(res, 400, error.message)
-    } else if (error instanceof PropertyRequiredError) {
-      formatErrorResponse(res, 400, error.message)
-    } else if (error instanceof ValidationError) {
-      formatErrorResponse(res, 400, error.message)
-    } else if (error instanceof NotFound) {
-      formatErrorResponse(res, 400, error.message)
+    if (error instanceof BaseError) {
+      formatErrorResponse(res, error.statusCode, error.message)
     } else {
-      formatErrorResponse(res, 500, RESPONSE_MESSAGES.SERVER_ERROR)
+      formatErrorResponse(res, 500, (error as Error).message)
     }
   }
 })
@@ -161,13 +164,11 @@ router.delete('/:id', async (req: Request, res: Response) => {
 
     const result: DatabaseResponse<User[]> = await userRepo.deleteUser(id)
     formatSuccessResponse(res, 200, result)
-  } catch (error) {
-    if (error instanceof InvalidId) {
-      formatErrorResponse(res, 400, error.message)
-    } else if (error instanceof NotFound) {
-      formatErrorResponse(res, 400, error.message)
+  } catch (error: unknown) {
+    if (error instanceof BaseError) {
+      formatErrorResponse(res, error.statusCode, error.message)
     } else {
-      formatErrorResponse(res, 500, RESPONSE_MESSAGES.SERVER_ERROR)
+      formatErrorResponse(res, 500, (error as Error).message)
     }
   }
 })

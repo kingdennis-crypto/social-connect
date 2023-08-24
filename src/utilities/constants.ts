@@ -1,7 +1,40 @@
+type TypeResource = 'user' | 'post' | 'profile' | 'media'
+
+const formatNotFoundMessage = (
+  typeOfResource: TypeResource,
+  id?: string
+): string =>
+  `The ${typeOfResource.toLowerCase()} ${
+    id && `with id ${id}`
+  } couldn't be found`
+
+const formatResourceExistsMessage = (typeOfResource: TypeResource): string =>
+  `This ${typeOfResource.toLowerCase()} already exists`
+
+export const RESPONSE = {
+  SERVER_ERROR: 'Internal server error',
+  RESOURCE: {
+    NOT_FOUND: formatNotFoundMessage,
+    ALREADY_EXISTS: formatResourceExistsMessage,
+    NOT_THE_OWNER: "You're not the owner of this resource",
+  },
+  REQUEST: {
+    EMPTY_FIELDS: 'Not all fields were filled in',
+    NON_MATCHING_ID: "The id's aren't matching",
+  },
+  AUTHORIZATION: {
+    INVALID_CREDENTIALS: 'Invalid login credentials',
+    EMAIL_IN_USE: 'This e-mail is already in use',
+  },
+  QUERY: {
+    INVALID_ID: 'Invalid ID',
+  },
+}
+
 export const RESPONSE_MESSAGES = {
+  SERVER_ERROR: 'Internal server error',
   INVALID_ID: 'Invalid ID',
   ID_MISMATCH: "The ID's don't match",
-  SERVER_ERROR: 'Internal server error',
   CONTENT: {
     USER_EXISTS: 'This email is already in use',
     EMPTY_FIELDS: 'Not all fields were filled in',

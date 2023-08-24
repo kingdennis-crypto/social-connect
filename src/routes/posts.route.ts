@@ -1,24 +1,45 @@
-import PostRepo from '@/repositories/post'
-import { RESPONSE_MESSAGES } from '@/utilities/constants'
-import { PropertyRequiredError } from '@/utilities/errors'
+// Types
+import type {
+  DatabaseResponse,
+  DecodedToken,
+} from '@/utilities/types/utilities.type'
+import type { Post } from '@/utilities/types/models.type'
+import type { Request, Response, Router } from 'express'
+
+// Helpers
+import upload from '@/utilities/helpers/upload'
+
+// Repos
+import PostRepo from '@/repositories/post.repo'
+
+// Error Handling
+import { RESPONSE } from '@/utilities/constants'
+import { PropertyRequiredError } from '@/utilities/errors/request.error'
 import {
   formatErrorResponse,
   formatSuccessResponse,
 } from '@/utilities/helpers/response'
-import upload from '@/utilities/helpers/upload'
+
 import { isAuthenticated } from '@/utilities/middleware'
-import { DatabaseResponse, DecodedToken, Post } from '@/utilities/types'
-import express, { Request, Response, Router } from 'express'
+
+// Others
+import express from 'express'
+import BaseError from '@/utilities/errors/base.error'
 
 const router: Router = express.Router()
+
 const repo: PostRepo = new PostRepo()
 
 router.get('/', async (req: Request, res: Response): Promise<void> => {
   try {
     const result = await repo.getAllPublicPosts()
     formatSuccessResponse(res, 200, result)
-  } catch (error) {
-    formatErrorResponse(res, 500, RESPONSE_MESSAGES.SERVER_ERROR)
+  } catch (error: unknown) {
+    if (error instanceof BaseError) {
+      formatErrorResponse(res, error.statusCode, error.message)
+    } else {
+      formatErrorResponse(res, 500, (error as Error).message)
+    }
   }
 })
 
@@ -31,7 +52,7 @@ router.post(
       const body: Post = req.body
 
       if (!body.content) {
-        throw new PropertyRequiredError(RESPONSE_MESSAGES.CONTENT.EMPTY_FIELDS)
+        throw new PropertyRequiredError(RESPONSE.REQUEST.EMPTY_FIELDS)
       }
 
       const result: DatabaseResponse<Post[]> = await repo.createPost(
@@ -42,11 +63,11 @@ router.post(
       )
 
       formatSuccessResponse(res, 200, result)
-    } catch (error) {
-      if (error instanceof PropertyRequiredError) {
-        formatErrorResponse(res, 400, (error as Error).message)
+    } catch (error: unknown) {
+      if (error instanceof BaseError) {
+        formatErrorResponse(res, error.statusCode, error.message)
       } else {
-        formatErrorResponse(res, 500, RESPONSE_MESSAGES.SERVER_ERROR)
+        formatErrorResponse(res, 500, (error as Error).message)
       }
     }
   }
@@ -63,8 +84,12 @@ router.delete(
       const deletedPost = await repo.deletePost(postId, decodedToken.id)
 
       formatSuccessResponse(res, 200, deletedPost)
-    } catch (error) {
-      formatErrorResponse(res, 500, (error as Error).message)
+    } catch (error: unknown) {
+      if (error instanceof BaseError) {
+        formatErrorResponse(res, error.statusCode, error.message)
+      } else {
+        formatErrorResponse(res, 500, (error as Error).message)
+      }
     }
   }
 )
@@ -77,7 +102,11 @@ router.post(
     try {
       formatSuccessResponse(res, 200, { count: 0, data: 'Good job' })
     } catch (error) {
-      formatErrorResponse(res, 500, (error as Error).message)
+      if (error instanceof BaseError) {
+        formatErrorResponse(res, error.statusCode, error.message)
+      } else {
+        formatErrorResponse(res, 500, (error as Error).message)
+      }
     }
   }
 )

@@ -1,14 +1,24 @@
-import type { User } from '@/utilities/types'
-import express, { Router, Request, Response } from 'express'
-// import EncryptionHelper from '@/utilities/helpers/encryption'
-import AuthenticationRepo from '@/repositories/authentication'
+// Types
+import type { User } from '@/utilities/types/models.type'
+import type { Router, Request, Response } from 'express'
+
+// Helpers
 import TokenHelper from '@/utilities/helpers/token'
+
+// Repos
+import AuthenticationRepo from '@/repositories/authentication.repo'
+
+// Error Handling
+import BaseError from '@/utilities/errors/base.error'
+import { RESPONSE } from '@/utilities/constants'
+import { PropertyRequiredError } from '@/utilities/errors/request.error'
 import {
   formatErrorResponse,
   formatSuccessResponse,
 } from '@/utilities/helpers/response'
-import { RESPONSE_MESSAGES } from '@/utilities/constants'
-import { InvalidLoginCredentials, NoProfile } from '@/utilities/errors'
+
+// Other
+import express from 'express'
 
 const router: Router = express.Router()
 const repo: AuthenticationRepo = new AuthenticationRepo()
@@ -20,6 +30,10 @@ router.post('/', async (req: Request, res: Response) => {
   try {
     // TODO: Make a check to see if the user already has a profile
     const user: UserBody = req.body
+
+    if (!(user.email && user.password)) {
+      throw new PropertyRequiredError(RESPONSE.REQUEST.EMPTY_FIELDS)
+    }
 
     // Validate the user
     const authenticatedUser = await repo.authenticateUser(
@@ -41,12 +55,10 @@ router.post('/', async (req: Request, res: Response) => {
     // Return the token
     formatSuccessResponse(res, 200, null, headers)
   } catch (error: unknown) {
-    if (error instanceof InvalidLoginCredentials) {
-      formatErrorResponse(res, 400, error.message)
-    } else if (error instanceof NoProfile) {
-      formatErrorResponse(res, 400, error.message)
+    if (error instanceof BaseError) {
+      formatErrorResponse(res, error.statusCode, error.message)
     } else {
-      formatErrorResponse(res, 500, RESPONSE_MESSAGES.SERVER_ERROR)
+      formatErrorResponse(res, 500, (error as Error).message)
     }
   }
 })

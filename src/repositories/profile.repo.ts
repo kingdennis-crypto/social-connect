@@ -1,12 +1,16 @@
-import { RESPONSE_MESSAGES } from '@/utilities/constants'
-import { NotFound } from '@/utilities/errors'
+// Types
+import type { DatabaseResponse } from '@/utilities/types/utilities.type'
+import type { Profile } from '@/utilities/types/models.type'
+
+// Services
 import DatabaseService from '@/utilities/services/database'
 import LoggerService from '@/utilities/services/logger'
-import {
-  DatabaseResponse,
-  Profile,
-  UserInnerJoinProfile,
-} from '@/utilities/types'
+
+// Error handling
+import { RESPONSE } from '@/utilities/constants'
+import { ResourceNotFound } from '@/utilities/errors/query.error'
+
+import { UserInnerJoinProfile } from '@/utilities/types'
 
 const loggerService = LoggerService.getInstance()
 const logger = loggerService.getLogger()
@@ -17,9 +21,11 @@ export default class ProfileRepo extends DatabaseService {
   }
 
   async createProfile(
+    userId: number,
     profile: Profile
   ): Promise<DatabaseResponse<UserInnerJoinProfile[]>> {
     try {
+      // TODO: Add validation to check if a profile already exists
       const result = await super.queryDBWithValues<UserInnerJoinProfile[]>(
         `WITH inserted_profile AS (
            INSERT INTO profile (user_id, username, bio, profile_image)
@@ -27,13 +33,30 @@ export default class ProfileRepo extends DatabaseService {
          ) SELECT inserted_profile.*, users.email, users.role FROM inserted_profile 
          INNER JOIN users
          ON users.id = inserted_profile.user_id`,
-        [
-          profile.user_id,
-          profile.username,
-          profile.bio,
-          profile.profile_image || null,
-        ]
+        [userId, profile.username, profile.bio, profile.profile_image || null]
       )
+
+      return result
+    } catch (error: unknown) {
+      logger.error((error as Error).message)
+      throw error
+    }
+  }
+
+  async getProfileByEmail(email: string): Promise<DatabaseResponse<unknown>> {
+    try {
+      const result = await super.queryDBWithValues<unknown>(
+        `SELECT profile.*, users.email, users.role
+        FROM users
+        INNER JOIN profile
+        ON users.id = profile.user_id
+        WHERE users.email = $1`,
+        [email]
+      )
+
+      if (result.count === 0) {
+        throw new ResourceNotFound(RESPONSE.RESOURCE.NOT_FOUND('profile'), 404)
+      }
 
       return result
     } catch (error: unknown) {
@@ -57,7 +80,7 @@ export default class ProfileRepo extends DatabaseService {
       )
 
       if (result.count === 0) {
-        throw new NotFound(RESPONSE_MESSAGES.NOT_FOUND.PROFILE)
+        throw new ResourceNotFound(RESPONSE.RESOURCE.NOT_FOUND('profile'), 404)
       }
 
       return result
@@ -82,7 +105,7 @@ export default class ProfileRepo extends DatabaseService {
       )
 
       if (profile.count === 0) {
-        throw new NotFound(RESPONSE_MESSAGES.NOT_FOUND.PROFILE)
+        throw new ResourceNotFound(RESPONSE.RESOURCE.NOT_FOUND('profile'), 404)
       }
 
       return profile

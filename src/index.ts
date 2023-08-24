@@ -14,10 +14,10 @@ import LoggerService from '@/utilities/services/logger'
 const PORT: number = (process.env.PORT as unknown as number) || 3000
 
 // Routes
-import UserRoutes from '@/routes/users'
-import AuthenticationRoutes from '@/routes/authentication'
-import PostRoutes from '@/routes/posts'
-import ProfileRoutes from '@/routes/profiles'
+import UserRoutes from '@/routes/users.route'
+import AuthenticationRoutes from '@/routes/authentication.route'
+import PostRoutes from '@/routes/posts.route'
+import ProfileRoutes from '@/routes/profiles.route'
 
 // Initialize connection service
 ConnectionService.getInstance()

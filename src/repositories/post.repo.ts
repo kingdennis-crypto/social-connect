@@ -1,8 +1,14 @@
-import { RESPONSE_MESSAGES } from '@/utilities/constants'
-import { NotFound, NotTheOwner } from '@/utilities/errors'
+// Types
+import type { DatabaseResponse, Post } from '@/utilities/types'
+
+// Services
 import DatabaseService from '@/utilities/services/database'
 import LoggerService from '@/utilities/services/logger'
-import { DatabaseResponse, Post } from '@/utilities/types'
+
+// Error handling
+import { RESPONSE } from '@/utilities/constants'
+import { NotTheOwner } from '@/utilities/errors/authentication.error'
+import { ResourceNotFound } from '@/utilities/errors/query.error'
 
 const loggerService = LoggerService.getInstance()
 const logger = loggerService.getLogger()
@@ -12,14 +18,21 @@ export default class PostRepo extends DatabaseService {
     super()
   }
 
+  /* SELECT orders.id,
+      addresses.name,
+      array_agg(DISTINCT products.sku )
+  FROM orders 
+  LEFT JOIN addresses
+  ON orders.address_id = addresses.id
+  LEFT JOIN line_items
+  ON line_items.order_id = orders.id
+  LEFT JOIN  products
+  ON products.id = line_items.product_id
+  GROUP BY orders.id,addresses.name */
+
   async getAll(): Promise<DatabaseResponse<Post[]>> {
     try {
       return await super.queryDB<Post[]>('SELECT * FROM posts')
-
-      // return await super.queryDBWithValues<Post[]>(
-      //   'SELECT * FROM posts LIMIT $1 OFFSET $2',
-      //   [limit, offset]
-      // )
     } catch (error) {
       logger.error((error as Error).message)
       throw error
@@ -46,17 +59,12 @@ export default class PostRepo extends DatabaseService {
 
       // If the post doesn't exists, throw error
       if (post.count === 0) {
-        throw new NotFound(RESPONSE_MESSAGES.NOT_FOUND.RESOURCE)
+        throw new ResourceNotFound(RESPONSE.RESOURCE.NOT_FOUND('post'), 404)
       }
 
       return post
     } catch (error: unknown) {
-      if (error instanceof NotFound) {
-        logger.error(RESPONSE_MESSAGES.NOT_FOUND.RESOURCE)
-      } else {
-        logger.error((error as Error).message)
-      }
-
+      logger.error((error as Error).message)
       throw error
     }
   }
@@ -91,7 +99,7 @@ export default class PostRepo extends DatabaseService {
 
       // Check if the user id is the same as the owner of the post
       if (post.user_id !== userId) {
-        throw new NotTheOwner(RESPONSE_MESSAGES.CONTENT.NOT_THE_OWNER)
+        throw new NotTheOwner(RESPONSE.RESOURCE.NOT_THE_OWNER, 404)
       }
 
       // Delete the post
