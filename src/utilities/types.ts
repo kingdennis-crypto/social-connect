@@ -1,6 +1,3 @@
-type ErrorModule = typeof import('@/utilities/errors')
-export type Error = ErrorModule[keyof ErrorModule]
-
 /**
  * UTILITITES
  */
@@ -47,6 +44,12 @@ export type Profile = {
   username: string
   bio: string
   profile_image: string
+}
+
+export type Media = {
+  id: number
+  url: string
+  post_id: number
 }
 
 export type DecodedToken = {
