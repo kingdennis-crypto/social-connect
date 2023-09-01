@@ -14,8 +14,8 @@ import {
 // Other
 import express from 'express'
 import BaseError from '@/utilities/errors/base.error'
-import { isAuthenticated } from '@/utilities/middleware'
 import { requireFieldsOrParams } from '@/utilities/middleware/request.middleware'
+import { isAuthenticated } from '@/utilities/middleware/authentication.middleware'
 
 const router: Router = express.Router()
 const repo: ProfileRepo = new ProfileRepo()

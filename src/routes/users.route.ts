@@ -15,17 +15,17 @@ import {
   formatErrorResponse,
   formatSuccessResponse,
 } from '@/utilities/helpers/response'
+import BaseError from '@/utilities/errors/base.error'
+import {
+  ValidationError,
+  PropertyRequiredError,
+} from '@/utilities/errors/request.error'
 
 // Other
 import express from 'express'
 
-import {
-  ValidationError,
-  PropertyRequiredError,
-  InvalidId,
-} from '@/utilities/errors'
-import BaseError from '@/utilities/errors/base.error'
 import { requireFieldsOrParams } from '@/utilities/middleware/request.middleware'
+import { InvalidField } from '@/utilities/errors/query.error'
 
 const router: Router = express.Router()
 const userRepo: UserRepo = new UserRepo()
@@ -68,7 +68,7 @@ router.get(
       const isValidId: boolean = isNumber(req.params.id)
 
       if (!isValidId) {
-        throw new InvalidId(RESPONSE_MESSAGES.INVALID_ID)
+        throw new InvalidField(RESPONSE_MESSAGES.INVALID_ID)
       }
 
       const id: number = parseInt(req.params.id)
@@ -132,7 +132,7 @@ router.put('/:id', async (req: Request, res: Response) => {
     const isValidId: boolean = isNumber(req.params.id)
 
     if (!isValidId) {
-      throw new InvalidId(RESPONSE_MESSAGES.INVALID_ID)
+      throw new InvalidField(RESPONSE_MESSAGES.INVALID_ID)
     }
 
     const id: number = parseInt(req.params.id)
@@ -166,7 +166,7 @@ router.delete('/:id', async (req: Request, res: Response) => {
     const isValidId: boolean = isNumber(req.params.id)
 
     if (!isValidId) {
-      throw new InvalidId(RESPONSE_MESSAGES.INVALID_ID)
+      throw new InvalidField(RESPONSE_MESSAGES.INVALID_ID)
     }
 
     const id: number = parseInt(req.params.id)

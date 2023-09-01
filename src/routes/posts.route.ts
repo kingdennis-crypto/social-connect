@@ -18,12 +18,11 @@ import {
   formatSuccessResponse,
 } from '@/utilities/helpers/response'
 
-import { isAuthenticated } from '@/utilities/middleware'
-
 // Others
 import express from 'express'
 import BaseError from '@/utilities/errors/base.error'
 import { requireFieldsOrParams } from '@/utilities/middleware/request.middleware'
+import { isAuthenticated } from '@/utilities/middleware/authentication.middleware'
 
 const router: Router = express.Router()
 

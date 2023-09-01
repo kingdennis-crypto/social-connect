@@ -1,11 +1,16 @@
 import { Request, Response, NextFunction } from 'express'
 import TokenHelper from '@/utilities/helpers/token'
-import { InvalidRole, InvalidToken, Unauthenticated } from './errors'
-import { RESPONSE_MESSAGES } from './constants'
+import { RESPONSE_MESSAGES } from '@/utilities/constants'
 import LoggerService from '@/utilities/services/logger'
 import { formatErrorResponse } from '@/utilities/helpers/response'
-import { JsonWebTokenError } from 'jsonwebtoken'
-import { DecodedToken } from './types'
+import { DecodedToken } from '@/utilities/types'
+
+import BaseError from '@/utilities/errors/base.error'
+import {
+  InvalidRole,
+  InvalidToken,
+  Unauthenticated,
+} from '@/utilities/errors/authentication.error'
 
 const loggerService = LoggerService.getInstance()
 const logger = loggerService.getLogger()
@@ -42,14 +47,11 @@ export async function isAuthenticated(
     // If the token is valid, call the next function
     return next()
   } catch (error: unknown) {
-    if (error instanceof Unauthenticated) {
-      formatErrorResponse(res, 400, (error as Error).message)
-    } else if (error instanceof InvalidToken) {
-      formatErrorResponse(res, 400, (error as Error).message)
-    } else if (error instanceof JsonWebTokenError) {
-      formatErrorResponse(res, 400, (error as Error).message)
+    logger.error((error as Error).message)
+
+    if (error instanceof BaseError) {
+      formatErrorResponse(res, error.statusCode, error.message)
     } else {
-      logger.error((error as Error).message)
       formatErrorResponse(res, 500, (error as Error).message)
     }
   }
@@ -78,27 +80,12 @@ export async function isAdmin(
     // If the user is a admin, call the next function
     return next()
   } catch (error) {
-    if (error instanceof InvalidRole) {
-      formatErrorResponse(res, 400, (error as Error).message)
+    logger.error((error as Error).message)
+
+    if (error instanceof BaseError) {
+      formatErrorResponse(res, error.statusCode, error.message)
     } else {
-      logger.error((error as Error).message)
-      formatErrorResponse(res, 500, RESPONSE_MESSAGES.SERVER_ERROR)
+      formatErrorResponse(res, 500, (error as Error).message)
     }
   }
 }
-
-// export async function isOwnUser(
-//   req: Request,
-//   res: Response,
-//   next: NextFunction
-// ) {
-//   try {
-//     // Get the token from the local state
-//     const decodedToken: DecodedToken = res.locals.decodedToken
-
-//     return next()
-//   } catch (error) {
-//     logger.error((error as Error).message)
-//     formatErrorResponse(res, 500, RESPONSE_MESSAGES.SERVER_ERROR)
-//   }
-// }
