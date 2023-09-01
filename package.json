@@ -1,7 +1,7 @@
 {
-  "name": "custom-api",
+  "name": "social-connect",
   "version": "1.0.0",
-  "description": "",
+  "description": "A versatile API with token-based authentication, access and error logging, and media upload capabilities.",
   "main": "index.js",
   "scripts": {
     "dev": "npx nodemon",
