@@ -30,3 +30,17 @@ export const requireFieldsOrParams =
 
     next()
   }
+
+export function setHeaders(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void {
+  // Remove the standard X-Powered-By header
+  res.removeHeader('X-Powered-By')
+
+  // Add some basic cache control for requesting browsers
+  res.setHeader('Cache-Control', 'private, max-age=120')
+
+  next()
+}

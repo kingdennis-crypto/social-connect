@@ -13,6 +13,9 @@ import LoggerService from '@/utilities/services/logger'
 
 const PORT: number = (process.env.PORT as unknown as number) || 3000
 
+// Middleware
+import { setHeaders } from './utilities/middleware/request.middleware'
+
 // Routes
 import UserRoutes from '@/routes/users.route'
 import AuthenticationRoutes from '@/routes/authentication.route'
@@ -33,6 +36,8 @@ APP.use(bodyParser.json())
 APP.use(bodyParser.raw())
 
 APP.use(cors())
+
+APP.use(setHeaders)
 
 APP.use('/users', UserRoutes)
 APP.use('/authentication', AuthenticationRoutes)
