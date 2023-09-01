@@ -10,8 +10,6 @@ import AuthenticationRepo from '@/repositories/authentication.repo'
 
 // Error Handling
 import BaseError from '@/utilities/errors/base.error'
-import { RESPONSE } from '@/utilities/constants'
-import { PropertyRequiredError } from '@/utilities/errors/request.error'
 import {
   formatErrorResponse,
   formatSuccessResponse,
@@ -19,6 +17,7 @@ import {
 
 // Other
 import express from 'express'
+import { requireFieldsOrParams } from '@/utilities/middleware/request.middleware'
 
 const router: Router = express.Router()
 const repo: AuthenticationRepo = new AuthenticationRepo()
@@ -26,41 +25,40 @@ const repo: AuthenticationRepo = new AuthenticationRepo()
 // Create a new type without the id
 type UserBody = Omit<User, 'id'>
 
-router.post('/', async (req: Request, res: Response) => {
-  try {
-    // TODO: Make a check to see if the user already has a profile
-    const user: UserBody = req.body
+router.post(
+  '/',
+  requireFieldsOrParams(['email', 'password'], 'body'),
+  async (req: Request, res: Response) => {
+    try {
+      const user: UserBody = req.body
 
-    if (!(user.email && user.password)) {
-      throw new PropertyRequiredError(RESPONSE.REQUEST.EMPTY_FIELDS)
-    }
+      // Validate the user
+      const authenticatedUser = await repo.authenticateUser(
+        user.email,
+        user.password
+      )
 
-    // Validate the user
-    const authenticatedUser = await repo.authenticateUser(
-      user.email,
-      user.password
-    )
+      await repo.userHasProfile(authenticatedUser.id)
 
-    await repo.userHasProfile(authenticatedUser.id)
+      const tokenPayload = {
+        id: authenticatedUser.id,
+        email: authenticatedUser.email,
+        role: authenticatedUser.role,
+      }
 
-    const tokenPayload = {
-      id: authenticatedUser.id,
-      email: authenticatedUser.email,
-      role: authenticatedUser.role,
-    }
+      const token: string = await TokenHelper.getToken(tokenPayload)
+      const headers = { Authorization: `Bearer ${token}` }
 
-    const token: string = await TokenHelper.getToken(tokenPayload)
-    const headers = { Authorization: `Bearer ${token}` }
-
-    // Return the token
-    formatSuccessResponse(res, 200, null, headers)
-  } catch (error: unknown) {
-    if (error instanceof BaseError) {
-      formatErrorResponse(res, error.statusCode, error.message)
-    } else {
-      formatErrorResponse(res, 500, (error as Error).message)
+      // Return the token
+      formatSuccessResponse(res, 200, null, headers)
+    } catch (error: unknown) {
+      if (error instanceof BaseError) {
+        formatErrorResponse(res, error.statusCode, error.message)
+      } else {
+        formatErrorResponse(res, 500, (error as Error).message)
+      }
     }
   }
-})
+)
 
 export default router

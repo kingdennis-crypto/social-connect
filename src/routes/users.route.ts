@@ -25,6 +25,7 @@ import {
   InvalidId,
 } from '@/utilities/errors'
 import BaseError from '@/utilities/errors/base.error'
+import { requireFieldsOrParams } from '@/utilities/middleware/request.middleware'
 
 const router: Router = express.Router()
 const userRepo: UserRepo = new UserRepo()
@@ -59,61 +60,69 @@ router.get('/', async (req: Request, res: Response) => {
 /**
  * Route for retrieving a user by their id
  */
-router.get('/:id', async (req: Request, res: Response) => {
-  try {
-    const isValidId: boolean = isNumber(req.params.id)
+router.get(
+  '/:id',
+  requireFieldsOrParams(['id'], 'param'),
+  async (req: Request, res: Response) => {
+    try {
+      const isValidId: boolean = isNumber(req.params.id)
 
-    if (!isValidId) {
-      throw new InvalidId(RESPONSE_MESSAGES.INVALID_ID)
-    }
+      if (!isValidId) {
+        throw new InvalidId(RESPONSE_MESSAGES.INVALID_ID)
+      }
 
-    const id: number = parseInt(req.params.id)
-    const result: DatabaseResponse<User[]> = await userRepo.getById(id)
-    formatSuccessResponse(res, 200, result)
-  } catch (error: unknown) {
-    if (error instanceof BaseError) {
-      formatErrorResponse(res, error.statusCode, error.message)
-    } else {
-      formatErrorResponse(res, 500, (error as Error).message)
+      const id: number = parseInt(req.params.id)
+      const result: DatabaseResponse<User[]> = await userRepo.getById(id)
+      formatSuccessResponse(res, 200, result)
+    } catch (error: unknown) {
+      if (error instanceof BaseError) {
+        formatErrorResponse(res, error.statusCode, error.message)
+      } else {
+        formatErrorResponse(res, 500, (error as Error).message)
+      }
     }
   }
-})
+)
 
 /**
  * Route for retrieving all posts of a user
  */
-router.get('/:id/posts', async (req: Request, res: Response) => {
-  res.status(200).send('All posts')
-})
+router.get(
+  '/:id/posts',
+  requireFieldsOrParams(['id'], 'param'),
+  async (req: Request, res: Response) => {
+    res.status(200).send('All posts')
+  }
+)
 
 /**
  * Route for creating a new user
  */
-router.post('/', async (req: Request, res: Response) => {
-  try {
-    const user: UserBody = req.body
+router.post(
+  '/',
+  requireFieldsOrParams(['email', 'password'], 'body'),
+  async (req: Request, res: Response) => {
+    try {
+      const user: UserBody = req.body
 
-    if (!(user.email && user.password)) {
-      throw new PropertyRequiredError(RESPONSE_MESSAGES.CONTENT.EMPTY_FIELDS)
-    }
+      // Encrypt the password with bcrypt
+      const hashedPassword = await EncryptionHelper.hashPassword(user.password)
 
-    // Encrypt the password with bcrypt
-    const hashedPassword = await EncryptionHelper.hashPassword(user.password)
-
-    // Create the user and return it
-    const result: DatabaseResponse<User[]> = await userRepo.createUser(
-      user.email,
-      hashedPassword
-    )
-    formatSuccessResponse(res, 200, result)
-  } catch (error) {
-    if (error instanceof BaseError) {
-      formatErrorResponse(res, error.statusCode, error.message)
-    } else {
-      formatErrorResponse(res, 500, (error as Error).message)
+      // Create the user and return it
+      const result: DatabaseResponse<User[]> = await userRepo.createUser(
+        user.email,
+        hashedPassword
+      )
+      formatSuccessResponse(res, 200, result)
+    } catch (error) {
+      if (error instanceof BaseError) {
+        formatErrorResponse(res, error.statusCode, error.message)
+      } else {
+        formatErrorResponse(res, 500, (error as Error).message)
+      }
     }
   }
-})
+)
 
 /**
  * Route for updating a user by its id

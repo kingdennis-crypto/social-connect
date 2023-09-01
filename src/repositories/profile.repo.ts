@@ -1,6 +1,5 @@
 // Types
 import type { DatabaseResponse } from '@/utilities/types/utilities.type'
-import type { Profile } from '@/utilities/types/models.type'
 
 // Services
 import DatabaseService from '@/utilities/services/database'
@@ -22,7 +21,9 @@ export default class ProfileRepo extends DatabaseService {
 
   async createProfile(
     userId: number,
-    profile: Profile
+    username: string,
+    bio: string,
+    profile_image?: string
   ): Promise<DatabaseResponse<UserInnerJoinProfile[]>> {
     try {
       // TODO: Add validation to check if a profile already exists
@@ -33,7 +34,7 @@ export default class ProfileRepo extends DatabaseService {
          ) SELECT inserted_profile.*, users.email, users.role FROM inserted_profile 
          INNER JOIN users
          ON users.id = inserted_profile.user_id`,
-        [userId, profile.username, profile.bio, profile.profile_image || null]
+        [userId, username, bio, profile_image || null]
       )
 
       return result

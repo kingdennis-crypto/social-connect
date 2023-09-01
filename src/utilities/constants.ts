@@ -11,6 +11,12 @@ const formatNotFoundMessage = (
 const formatResourceExistsMessage = (typeOfResource: TypeResource): string =>
   `This ${typeOfResource.toLowerCase()} already exists`
 
+const formatRequiredFieldsMessage = (fields: string[]): string =>
+  `The following fields are all required for this route: ${fields.join(', ')}`
+
+const formatRequiredParamsMessage = (params: string[]): string =>
+  `The following fields are all required for this route: ${params.join(', ')}`
+
 export const RESPONSE = {
   SERVER_ERROR: 'Internal server error',
   RESOURCE: {
@@ -19,7 +25,8 @@ export const RESPONSE = {
     NOT_THE_OWNER: "You're not the owner of this resource",
   },
   REQUEST: {
-    EMPTY_FIELDS: 'Not all fields were filled in',
+    EMPTY_FIELDS: formatRequiredFieldsMessage,
+    EMPTY_PARAMS: formatRequiredParamsMessage,
     NON_MATCHING_ID: "The id's aren't matching",
   },
   AUTHORIZATION: {

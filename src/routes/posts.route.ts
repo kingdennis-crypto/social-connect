@@ -13,8 +13,6 @@ import upload from '@/utilities/helpers/upload'
 import PostRepo from '@/repositories/post.repo'
 
 // Error Handling
-import { RESPONSE } from '@/utilities/constants'
-import { PropertyRequiredError } from '@/utilities/errors/request.error'
 import {
   formatErrorResponse,
   formatSuccessResponse,
@@ -25,6 +23,7 @@ import { isAuthenticated } from '@/utilities/middleware'
 // Others
 import express from 'express'
 import BaseError from '@/utilities/errors/base.error'
+import { requireFieldsOrParams } from '@/utilities/middleware/request.middleware'
 
 const router: Router = express.Router()
 
@@ -46,19 +45,16 @@ router.get('/', async (req: Request, res: Response): Promise<void> => {
 router.post(
   '/',
   isAuthenticated,
+  requireFieldsOrParams(['content', 'is_public'], 'body'),
   async (req: Request, res: Response): Promise<void> => {
     try {
       const decodedToken: DecodedToken = res.locals.decodedToken
       const body: Post = req.body
 
-      if (!body.content) {
-        throw new PropertyRequiredError(RESPONSE.REQUEST.EMPTY_FIELDS)
-      }
-
       const result: DatabaseResponse<Post[]> = await repo.createPost(
         decodedToken.id,
         body.content,
-        body.is_public || false,
+        body.is_public,
         body.media_url || null
       )
 
@@ -76,6 +72,7 @@ router.post(
 router.delete(
   '/:id',
   isAuthenticated,
+  requireFieldsOrParams(['id'], 'param'),
   async (req: Request, res: Response): Promise<void> => {
     try {
       const decodedToken: DecodedToken = res.locals.decodedToken
